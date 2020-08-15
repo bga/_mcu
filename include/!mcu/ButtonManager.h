@@ -170,12 +170,17 @@ template<typename ConfigArg> struct PressDelayLongPress: Base {
 	}
 
 	virtual void onUp() override  {
-		this->state = State_released;
+		if(this->state == State_pressed) {
+			this->state = State_released;
+			this->onPress();
+		}
+		else {
+			this->state = State_released;
+		}
 	}
 	virtual void onDown() override  {
 		this->pressStartTicksCount = getTicksCount();
 		this->state = State_pressed;
-		this->onPress();
 	}
 
 	virtual void timerThread() override  {
