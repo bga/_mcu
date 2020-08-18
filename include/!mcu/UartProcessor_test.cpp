@@ -2,6 +2,6 @@
 
 #include <UartProcessor.h>
 
-int main() {
-	return 0;
+int main(int argc, const char* argv[]) {
+  return testRunnerMain(argc, argv);
 }
