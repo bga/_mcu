@@ -1,0 +1,7 @@
+FatFS
+SD card
+Encoder
+Nokia LCD
+1602/2004 lcd
+OLED display
+?AD9833 generator
