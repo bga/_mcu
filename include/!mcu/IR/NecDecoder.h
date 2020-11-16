@@ -16,6 +16,8 @@
 
 #pargma once
 
+#error Not tested
+
 namespace IR {
 
 #if 0
