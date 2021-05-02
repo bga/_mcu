@@ -38,7 +38,7 @@ struct Config {
 #pragma push_macro("Self")
 
 #undef Self
-#define Self ClassName
+#define Self Spi
 template<typename ConfigArg> struct Self {
 	typedef ConfigArg Config;
 	Config m_config;
