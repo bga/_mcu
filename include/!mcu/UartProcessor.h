@@ -58,10 +58,10 @@ struct UartProcessor {
 	typedef typename Config::ErrorCode ErrorCode;
 	typedef typename Config::Name Name;
 
-	virtual ErrorCode readData(FU16 name, MemoryRegion& data) = 0; union {
+	virtual ErrorCode readData(Name name, MemoryRegion& data) = 0; union {
 
 	};
-	virtual ErrorCode writeData(FU16 name, MemoryRegion data) = 0; union {
+	virtual ErrorCode writeData(Name name, MemoryRegion data) = 0; union {
 
 	};
 
@@ -275,14 +275,14 @@ example("UartProcessor") {
 	struct AppUartProcessor: UartProcessor<UartProcessorConfig> {
 		U16 aParam;
 		U16 bParam;
-		ErrorCode readData(FU16 name, MemoryRegion& data) override {
+		ErrorCode readData(Name name, MemoryRegion& data) override {
 			switch(name) {
 				case('a'): return (data.data = reinterpret_cast<U8 *>(&(this->aParam))), (data.dataSize = sizeof(this->aParam)), Error_ok;
 				default: return Error_nameNotFound;
 			}
 
 		}
-		ErrorCode writeData(FU16 name, MemoryRegion data) override {
+		ErrorCode writeData(Name name, MemoryRegion data) override {
 			Debug_print("%i", data.dataSize);
 			switch(name) {
 				case('a'): return (data.dataSize == sizeof(this->aParam)) ? (this->aParam = *reinterpret_cast<U16 *>(data.data), Error_ok) : Error_valueSize;
