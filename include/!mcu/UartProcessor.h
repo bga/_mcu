@@ -35,10 +35,10 @@
 #if 0
 struct Config {
 	typedef FU32 ErrorCode;
-	typedef FU16 Name;
+	typedef FU16 Hash;
 
 	enum {
-		nameMaxSize = sizeof(Name),
+		nameMaxSize = sizeof(Hash),
 		operatorSize = 1,
 		dataMaxSize = 32,
 
@@ -46,6 +46,11 @@ struct Config {
 	};
 	void write(FU8 byte) {
 
+	}
+	
+	static const Hash Hash_initValue = 0;
+	Hash Hash_append(Hash hash, U8 ch) {
+		return 31 * hash + ch;
 	}
 };
 #endif // 1
@@ -56,12 +61,12 @@ struct UartProcessor {
 	Config config;
 
 	typedef typename Config::ErrorCode ErrorCode;
-	typedef typename Config::Name Name;
+	typedef typename Config::Hash Hash;
 
-	virtual ErrorCode readData(Name name, MemoryRegion& data) = 0; union {
+	virtual ErrorCode readData(Hash hash, MemoryRegion& data) = 0; union {
 
 	};
-	virtual ErrorCode writeData(Name name, MemoryRegion data) = 0; union {
+	virtual ErrorCode writeData(Hash hash, MemoryRegion data) = 0; union {
 
 	};
 
@@ -157,20 +162,20 @@ struct UartProcessor {
 			FU32 errorCode = Error_unknown;
 			FU8 i = 0;
 
-//			FU32 name = ((FU32 *)this->buffer)[0];
-			Name name = 0;
+//			FU32 hash = ((FU32 *)this->buffer)[0];
+			Hash hash = config.Hash_initValue;
 			while(i < this->bufferPos && this->buffer[i] != '?' && this->buffer[i] != '=') {
-				name = (name << 8) | this->buffer[i];
+				hash = config.Hash_append(hash, this->buffer[i]);
 				i += 1;
 			}
-			FU8 nameEnd = i;
-			FU8 op = this->buffer[nameEnd];
-			FU8 dataStart = nameEnd + 1;
-//			this->buffer[nameEnd] = 0;
+			FU8 hashEnd = i;
+			FU8 op = this->buffer[hashEnd];
+			FU8 dataStart = hashEnd + 1;
+//			this->buffer[hashEnd] = 0;
 			//# read
 			if(op == '?') {
 				MemoryRegion rData = { .dataSize = 0, .data = &(this->buffer[dataStart]) };
-				errorCode = this->readData(name, rData);
+				errorCode = this->readData(hash, rData);
 				if(errorCode == Error_ok) {
 					for(i = 0; i != rData.dataSize; i += 1) {
 						writeHex(rData.data[i]);
@@ -221,7 +226,7 @@ struct UartProcessor {
 					errorCode = Error_valueData;
 				}
 				else {
-					errorCode = this->writeData(name, wData);
+					errorCode = this->writeData(hash, wData);
 				}
 				#endif // 1
 
@@ -253,14 +258,14 @@ example("UartProcessor") {
 
 	struct UartProcessorConfig {
 		typedef FU32 ErrorCode;
-		typedef FU16 Name;
+		typedef FU16 Hash;
 
 		enum {
-			nameMaxSize = sizeof(Name),
+			hashMaxSize = sizeof(Hash),
 			operatorSize = 1,
 			dataMaxSize = 32,
 
-			bufferSize = nameMaxSize + operatorSize + dataMaxSize
+			bufferSize = hashMaxSize + operatorSize + dataMaxSize
 		};
 
 		std::string txBuffer;
@@ -269,23 +274,28 @@ example("UartProcessor") {
 			txBuffer.push_back(byte);
 		}
 
+		const Hash Hash_initValue = 0; //# c++ forbids static consts in local classes
+		Hash Hash_append(Hash hash, U8 ch) {
+			return ch | (hash << 8);
+		}
 	};
 
 
 	struct AppUartProcessor: UartProcessor<UartProcessorConfig> {
 		U16 aParam;
 		U16 bParam;
-		ErrorCode readData(Name name, MemoryRegion& data) override {
-			switch(name) {
+		ErrorCode readData(Hash hash, MemoryRegion& data) override {
+			switch(hash) {
 				case('a'): return (data.data = reinterpret_cast<U8 *>(&(this->aParam))), (data.dataSize = sizeof(this->aParam)), Error_ok;
 				default: return Error_nameNotFound;
 			}
 
 		}
-		ErrorCode writeData(Name name, MemoryRegion data) override {
+		ErrorCode writeData(Hash hash, MemoryRegion data) override {
 			Debug_print("%i", data.dataSize);
-			switch(name) {
+			switch(hash) {
 				case('a'): return (data.dataSize == sizeof(this->aParam)) ? (this->aParam = *reinterpret_cast<U16 *>(data.data), Error_ok) : Error_valueSize;
+				case('ab'): return (data.dataSize == sizeof(this->aParam)) ? (this->aParam = *reinterpret_cast<U16 *>(data.data), Error_ok) : Error_valueSize;
 				default: return Error_nameNotFound;
 			}
 		}
@@ -305,6 +315,11 @@ example("UartProcessor") {
 
 	appUartProcessor.config.txBuffer.clear();
 	assert_eq(appUartProcessor.readString("a=ABCD\n"), yes);
+	assert_eq(_.trimRight(appUartProcessor.config.txBuffer), std::string("\nOK"));
+	assert_eq(appUartProcessor.aParam, _.swapBytes(0xABCD));
+
+	appUartProcessor.config.txBuffer.clear();
+	assert_eq(appUartProcessor.readString("ab=ABCD\n"), yes);
 	assert_eq(_.trimRight(appUartProcessor.config.txBuffer), std::string("\nOK"));
 	assert_eq(appUartProcessor.aParam, _.swapBytes(0xABCD));
 
