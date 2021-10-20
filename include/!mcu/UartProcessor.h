@@ -26,10 +26,10 @@
 #include <!cpp/bitManipulations.h>
 
 
-#ifdef TESTRUNNER_ON
+#ifdef BGA__TESTRUNNER_ON
 	#include <string>
 	#include <!cpp/debug.h>
-#endif // TESTRUNNER_ON
+#endif // BGA__TESTRUNNER_ON
 
 //namespace UartProcessor {
 #if 0
@@ -242,7 +242,7 @@ struct UartProcessor {
 	}
 };
 
-#ifdef TESTRUNNER_ON
+#ifdef BGA__TESTRUNNER_ON
 example("UartProcessor") {
 	struct __ {
 		std::string trimRight(const std::string& str) {
@@ -353,7 +353,7 @@ example("UartProcessor") {
 	assert_eq(_.trimRight(appUartProcessor.config.txBuffer), std::string("\n#OVF"));
 
 }
-#endif // TESTRUNNER_ON
+#endif // BGA__TESTRUNNER_ON
 
 //} // namespace UartProcessor
 #endif
