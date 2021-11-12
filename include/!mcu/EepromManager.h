@@ -184,7 +184,7 @@ class Self {
 #undef p
 #undef Self
 
-#ifdef TESTRUNNER_ON
+#ifdef BGA__TESTRUNNER_ON
 #include <!cpp/AddlerCrc.h>
 
 example("EepromManager::generic") {

@@ -71,7 +71,7 @@ std::ostream& hex_dump(std::ostream& os, const std::string& buffer, bool showPri
     return hex_dump(os,reinterpret_cast<const uint8_t*>(buffer.data()), buffer.length(),showPrintableChars);
 }
 
-#define TESTRUNNER_ON
+#define BGA__TESTRUNNER_ON
 #include "EepromManager.h"
 
 int main(int argc, const char* argv[]) {

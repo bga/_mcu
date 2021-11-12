@@ -139,7 +139,7 @@ template<typename ConfigArg> struct Self {
 #else
 	#undef Self
 #endif
-#ifdef TESTRUNNER_ON
+#ifdef BGA__TESTRUNNER_ON
 example(STRING(Self)) {
 	struct Config {
 		typedef U32 SomeType;

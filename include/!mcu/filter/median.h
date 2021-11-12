@@ -187,7 +187,7 @@ namespace Filter {
 	}
 } //# namespace Filter
 
-#ifdef TESTRUNNER_ON
+#ifdef BGA__TESTRUNNER_ON
 example("Filter::median") {
 	using Filter::median;
 	
