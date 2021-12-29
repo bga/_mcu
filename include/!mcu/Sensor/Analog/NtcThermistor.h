@@ -65,7 +65,7 @@ struct Self<U16> {
 		BGA__MCU__SENSOR__ANALOG__NTC_THERMISTOR__DEBUG_INPECT(ratio);
 		FI16 logR = Math::Fp::log2fix(U16(ratio >> 4 /* 18.14 */) /* 2.14 */, 16 - 4) /* 4.12 */;
 		BGA__MCU__SENSOR__ANALOG__NTC_THERMISTOR__DEBUG_INPECT(logR);
-		FI16 oneDivAbsTemp = I16(((FU32(m_oneDivB /* -9.25 */) * logR /* 4.12 */) /* -5.37 */ >> 14) /* -7.23 */ + FI16(I16(1.0 / 273.15 * (uintmax_t(1) << 23))));
+		FI16 oneDivAbsTemp = I16(((FI32(m_oneDivB /* -9.25 */) * logR /* 4.12 */) /* -5.37 */ >> 14) /* -7.23 */ + FI16(I16(1.0 / 273.15 * (uintmax_t(1) << 23))));
 		BGA__MCU__SENSOR__ANALOG__NTC_THERMISTOR__DEBUG_INPECT(oneDivAbsTemp);
 		
 		return FI16(FI32(1UL << (30 - 1)) /* 3.29 */ / oneDivAbsTemp /* -7.23 */) /* 10.6 */ - FI16(I16(273.15 * (uintmax_t(1) << 6))) /* 10.6 */;
