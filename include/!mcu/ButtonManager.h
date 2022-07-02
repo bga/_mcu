@@ -80,7 +80,7 @@ template<typename ConfigArg> struct PressDelayPressRepeat: Base {
 		abstract;
 	}
 
-	TicksCount pressStartTicksCount;
+	TicksCount nextPressTicksCount;
 	Bool isPressed;
 
 	PressDelayPressRepeat() {
@@ -94,7 +94,7 @@ template<typename ConfigArg> struct PressDelayPressRepeat: Base {
 		this->isPressed = no;
 	}
 	virtual void onDown() override  {
-		this->pressStartTicksCount = getTicksCount() + config.multiPressDelay;
+		this->nextPressTicksCount = getTicksCount() + config.multiPressDelay;
 		this->isPressed = yes;
 		this->onPress();
 	}
@@ -103,8 +103,8 @@ template<typename ConfigArg> struct PressDelayPressRepeat: Base {
 		if(this->isPressed == no) {
 		}
 		else {
-			if(details::UInt_isLessOrEqThroughCarry(this->pressStartTicksCount, getTicksCount())) {
-				this->pressStartTicksCount += config.multiPressStep;
+			if(details::UInt_isLessOrEqThroughCarry(this->nextPressTicksCount, getTicksCount())) {
+				this->nextPressTicksCount += config.multiPressStep;
 				this->onPress();
 			}
 		}
