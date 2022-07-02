@@ -17,6 +17,16 @@
 */
 
 namespace ButtonManager {
+
+namespace details {
+template<class UIntArg, BGA__TEMPLATE__ENABLE_IF(::std::is_unsigned<UIntArg>::value)>
+Bool UInt_isLessOrEqThroughCarry(UIntArg a, UIntArg b) {
+	const UIntArg hiBit = UIntArg(-1) ^ (UIntArg(-1) >> 1); 
+	
+	return (UIntArg(b - a) & hiBit) == 0;
+}
+} //# namespace
+
 struct Base {
 	virtual void onDown() {
 		abstract;
@@ -84,7 +94,7 @@ template<typename ConfigArg> struct PressDelayPressRepeat: Base {
 		this->isPressed = no;
 	}
 	virtual void onDown() override  {
-		this->pressStartTicksCount = getTicksCount() + config.multiPressDelay - config.multiPressStep;
+		this->pressStartTicksCount = getTicksCount() + config.multiPressDelay;
 		this->isPressed = yes;
 		this->onPress();
 	}
@@ -93,7 +103,7 @@ template<typename ConfigArg> struct PressDelayPressRepeat: Base {
 		if(this->isPressed == no) {
 		}
 		else {
-			if(config.multiPressStep < (getTicksCount() - this->pressStartTicksCount)) {
+			if(details::UInt_isLessOrEqThroughCarry(this->pressStartTicksCount, getTicksCount())) {
 				this->pressStartTicksCount += config.multiPressStep;
 				this->onPress();
 			}
@@ -203,7 +213,7 @@ template<typename ConfigArg> struct PressDelayLongPress: Base {
 		if(this->state == State_released) {
 		}
 		else {
-			if(this->state < State_longPressed && config.longPressDelay < (getTicksCount() - this->pressStartTicksCount)) {
+			if(this->state < State_longPressed && details::UInt_isLessOrEqThroughCarry(this->pressStartTicksCount + config.longPressDelay, getTicksCount())) {
 				this->state += 1;
 				this->onLongPress();
 			}
