@@ -16,7 +16,7 @@
   limitations under the License.
 */
 
-namespace ButtonManager {
+namespace Bga { namespace Mcu { ButtonManager {
 
 namespace details {
 template<class UIntArg, BGA__TEMPLATE__ENABLE_IF(::std::is_unsigned<UIntArg>::value)>
@@ -220,6 +220,6 @@ template<typename ConfigArg> struct PressDelayLongPress: Base {
 		}
 	}
 };
-} //# namespace ButtonManager
+} } } //# namespace
 
 
