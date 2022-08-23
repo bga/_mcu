@@ -32,7 +32,7 @@ struct Config {
 	}
 	static void chipSelect(Bool isSelect) {
 	}
-	static void sleepMs(FU16 ms) {
+	static void yeild() {
 	}
 };
 #endif
@@ -98,7 +98,9 @@ template<typename ConfigArg> struct Self {
 	}
 	
 	void waitBusy() {
-		while(this->isBusy()) {}
+		while(this->isBusy()) {
+			this->config.yeild();
+		}
 	}
 	
 	struct Jedecid {
@@ -126,19 +128,11 @@ template<typename ConfigArg> struct Self {
 		
 	void eraseChip_nonBlocking() {
 		this->enableWrite(true);
-		
+
 		this->config.chipSelect(true);
 		this->config.spiWrite(CMD_CHIP_ERASE);
 		this->config.chipSelect(false);
 	}
-
-	void eraseChip() {
-		this->eraseChip_nonBlocking();
-		while(this->isBusy()) {
-			this->config.sleepMs(100);
-		}
-	}
-	
 	
 	private:
 	void inline writeAddress(Addr addr) {
@@ -176,7 +170,7 @@ template<typename ConfigArg> struct Self {
 		this->config.chipSelect(false);
 	}
 	
-	void read(Addr addr, U8* data, FU16 len) {
+	void read(Addr addr, Char* data, Size len) {
 		// this->waitBusy();
 
 		this->config.chipSelect(true);
@@ -191,7 +185,7 @@ template<typename ConfigArg> struct Self {
 		this->config.chipSelect(false);
 	}
 	
-	void write(Addr addr, U8* data, FU16 len) {
+	void write(Addr addr, Char const* data, Size len) {
 		this->enableWrite(true);
 		
 		this->config.chipSelect(true);
