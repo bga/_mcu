@@ -111,12 +111,17 @@ template<typename ConfigArg> struct Self {
 		jedecidPtr->capacity = this->config.spiRead(); 
 		this->config.chipSelect(false);
 	}
-	
-	void eraseChip_nonBlocking() {
-		//# Enable write, and send chip erase command
+
+	void enableWrite(Bool isEnable) { 
+		this->waitBusy();
+
 		this->config.chipSelect(true);
-		this->config.spiWrite(CMD_WRITE_ENABLE);
+		this->config.spiWrite((isEnable) ? CMD_WRITE_ENABLE : CMD_WRITE_DISABLE);
 		this->config.chipSelect(false);
+	}
+		
+	void eraseChip_nonBlocking() {
+		this->enableWrite(true);
 		
 		this->config.chipSelect(true);
 		this->config.spiWrite(CMD_CHIP_ERASE);
@@ -137,15 +142,11 @@ template<typename ConfigArg> struct Self {
 		this->config.spiWrite(U8(addr >>  8));  //# addr[15:8]
 		this->config.spiWrite(U8(addr >>  0));  //# addr[7:0]
   }
+
   public:  
   
   void eraseSector(FU32 addr) {
-		this->waitBusy();
-
-		//# Enable write, and send chip erase command
-		this->config.chipSelect(true);
-		this->config.spiWrite(CMD_WRITE_ENABLE);
-		this->config.chipSelect(false);
+		this->enableWrite(true);
 		
 		this->config.chipSelect(true);
 		this->config.spiWrite(CMD_SECTOR_ERASE);
@@ -154,12 +155,7 @@ template<typename ConfigArg> struct Self {
 	}
 	
 	void eraseBlock32K(FU32 addr) {
-		this->waitBusy();
-
-		//# Enable write, and send chip erase command
-		this->config.chipSelect(true);
-		this->config.spiWrite(CMD_WRITE_ENABLE);
-		this->config.chipSelect(false);
+		this->enableWrite(true);
 		
 		this->config.chipSelect(true);
 		this->config.spiWrite(CMD_BLOCK_ERASE_32K);
@@ -168,12 +164,7 @@ template<typename ConfigArg> struct Self {
 	}
 	
 	void eraseBlock64K(FU32 addr) {
-		this->waitBusy();
-
-		//# Enable write, and send chip erase command
-		this->config.chipSelect(true);
-		this->config.spiWrite(CMD_WRITE_ENABLE);
-		this->config.chipSelect(false);
+		this->enableWrite(true);
 		
 		this->config.chipSelect(true);
 		this->config.spiWrite(CMD_BLOCK_ERASE_64K);
@@ -197,11 +188,7 @@ template<typename ConfigArg> struct Self {
 	}
 	
 	void write(FU32 addr, U8* data, FU16 len) {
-		this->waitBusy();
-
-		this->config.chipSelect(true);
-		this->config.spiWrite(CMD_WRITE_ENABLE);
-		this->config.chipSelect(false);
+		this->enableWrite(true);
 		
 		this->config.chipSelect(true);
 		this->config.spiWrite(CMD_PAGEPROGRAM);
