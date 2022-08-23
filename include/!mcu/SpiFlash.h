@@ -23,6 +23,8 @@
 
 #if 0
 struct Config {
+	typedef FU32 Addr;
+	
 	static FU8 spiRead() {
 		return x;
 	}
@@ -42,6 +44,8 @@ struct Config {
 template<typename ConfigArg> struct Self {
 	typedef ConfigArg Config;
 	Config config;
+	
+	typedef typename Config::Addr Addr;
 	
 	Self() {
 	}
@@ -137,7 +141,7 @@ template<typename ConfigArg> struct Self {
 	
 	
 	private:
-	void inline writeAddress(FU32 addr) {
+	void inline writeAddress(Addr addr) {
 		this->config.spiWrite(U8(addr >> 16));  //# addr[23:16]
 		this->config.spiWrite(U8(addr >>  8));  //# addr[15:8]
 		this->config.spiWrite(U8(addr >>  0));  //# addr[7:0]
@@ -145,7 +149,7 @@ template<typename ConfigArg> struct Self {
 
   public:  
   
-  void eraseSector(FU32 addr) {
+  void eraseSector(Addr addr) {
 		this->enableWrite(true);
 		
 		this->config.chipSelect(true);
@@ -154,7 +158,7 @@ template<typename ConfigArg> struct Self {
 		this->config.chipSelect(false);
 	}
 	
-	void eraseBlock32K(FU32 addr) {
+	void eraseBlock32K(Addr addr) {
 		this->enableWrite(true);
 		
 		this->config.chipSelect(true);
@@ -163,7 +167,7 @@ template<typename ConfigArg> struct Self {
 		this->config.chipSelect(false);
 	}
 	
-	void eraseBlock64K(FU32 addr) {
+	void eraseBlock64K(Addr addr) {
 		this->enableWrite(true);
 		
 		this->config.chipSelect(true);
@@ -172,7 +176,7 @@ template<typename ConfigArg> struct Self {
 		this->config.chipSelect(false);
 	}
 	
-	void read(FU32 addr, U8* data, FU16 len) {
+	void read(Addr addr, U8* data, FU16 len) {
 		// this->waitBusy();
 
 		this->config.chipSelect(true);
@@ -187,7 +191,7 @@ template<typename ConfigArg> struct Self {
 		this->config.chipSelect(false);
 	}
 	
-	void write(FU32 addr, U8* data, FU16 len) {
+	void write(Addr addr, U8* data, FU16 len) {
 		this->enableWrite(true);
 		
 		this->config.chipSelect(true);
