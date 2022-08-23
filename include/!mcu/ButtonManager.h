@@ -58,7 +58,6 @@ struct Toggle: Base {
 		abstract;
 	}
 
-	Bool isPressed;
 	virtual void onDown() override  {
 		this->onToggle();
 	}
