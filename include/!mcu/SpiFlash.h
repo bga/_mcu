@@ -126,7 +126,7 @@ template<typename ConfigArg> struct Self {
 		this->config.chipSelect(false);
 	}
 		
-	void eraseChip_nonBlocking() {
+	void eraseChip() {
 		this->enableWrite(true);
 
 		this->config.chipSelect(true);
